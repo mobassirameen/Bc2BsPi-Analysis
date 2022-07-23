@@ -12,7 +12,7 @@ cmsenv
 
 voms-proxy-init -voms cms -valid 192:00
 
-git clone git@github.com:mobassirameen/BsPiPAT.git
+git clone git@github.com:mobassirameen/Bc2BsPi-Analysis.git
 
 scram b -j12
 

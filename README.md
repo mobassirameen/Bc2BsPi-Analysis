@@ -12,11 +12,15 @@ cmsenv
 
 voms-proxy-init -voms cms -valid 192:00
 
-git clone git@github.com:mobassirameen/Bc2BsPi-Analysis.git
+mkdir -p myAnalyzers
+
+cd myAnalyzers
+
+git clone git@github.com:mobassirameen/BspiPAT.git
 
 scram b -j12
 
-cd myAnalyzers/BsPiPAT/test/
+cd BspiPAT/test/
 
-cmsRun BsPiRootupler.py
+cmsRun BspiRootupler.py
 

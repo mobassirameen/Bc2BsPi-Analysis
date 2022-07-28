@@ -837,7 +837,7 @@ void Bspi::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
 		       pion4V.SetXYZM(iTrack3->px(),iTrack3->py(),iTrack3->pz(),pion_mass);
 		       Bs4V.SetXYZM(bCandMC->currentState().globalMomentum().x(),bCandMC->currentState().globalMomentum().y(),bCandMC->currentState().globalMomentum().z(),bCandMC->currentState().mass());
 		       
-		       ParticleMass PDG_BC_MASS = 6.2751; 
+		       //ParticleMass PDG_BC_MASS = 6.2751; 
 		       Bc4V=pion4V+Bs4V;
 		       //cout<<"mass Bc: "<<Bc4V.M()<<endl;
 		       //if(fabs(Bc4V.M() - PDG_BC_MASS > 0.6)) continue;
@@ -845,7 +845,7 @@ void Bspi::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
 		       //if ((Bc4V.M() - Bs4V.M() + bs_mass < 6.0) || (Bc4V.M() - Bs4V.M() + bs_mass > 6.6)) continue;
 		       //if ((Bc4V.M() - Bs4V.M() + bs_mass < 5.0) || (Bc4V.M() - Bs4V.M() + bs_mass > 6.6)) continue;
 		       //if ((Bc4V.M() - Bs4V.M() + bs_mass < 5.8) || (Bc4V.M() - Bs4V.M() + bs_mass > 6.6)) continue;
-		       if ((Bc4V.M() < 5.8) || (Bc4V.M() > 6.6)) continue;
+		       if ((Bc4V.M() < 5.3) || (Bc4V.M() > 7.3)) continue;
 		       //if ((Bc4V.M() < 6.0) || (Bc4V.M() > 6.6)) continue;
 		       //TLorentzVector bc4V;
 
@@ -882,7 +882,7 @@ void Bspi::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
 			 continue;
 		       }
 
-		       double Bc_mass_cjp_tmp = bspiCandMC->currentState().mass();
+		       //double Bc_mass_cjp_tmp = bspiCandMC->currentState().mass();
 		       //if(fabs(Bc_mass_cjp_tmp - PDG_BC_MASS) > 0.2) continue;
 		       //if(bspiCandMC->currentState().mass()<6.1 || bspiCandMC->currentState().mass()>6.7) continue;
 		       //if(bspiCandMC->currentState().mass()<6.1 || bspiCandMC->currentState().mass()>6.5) continue;
@@ -891,10 +891,11 @@ void Bspi::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
 		       //if(bspiCandMC->currentState().mass()<6.15 || bspiCandMC->currentState().mass()>6.22) continue;
 		       //if(bspiCandMC->currentState().mass()<5.8 || bspiCandMC->currentState().mass()>6.6) continue;
 		       //if(bspiCandMC->currentState().mass()<6.19 || bspiCandMC->currentState().mass()>6.22) continue; // Good Bc mass peak but problem with pion matching
-		       if(bspiCandMC->currentState().mass()<6.26|| bspiCandMC->currentState().mass()>6.28) continue; // Good Bc and pion is also matching- This mass window applied for MC and data- using this I also working with BDT.
+		       //if(bspiCandMC->currentState().mass()<6.26|| bspiCandMC->currentState().mass()>6.28) continue; // Good Bc and pion is also matching- This mass window applied for MC and data- using this I also working with BDT.
 		       //if(bspiCandMC->currentState().mass()<5.4 || bspiCandMC->currentState().mass()>7.2) continue;   // seems Good Bc mass but pion is also working-in this case also
 		       //if(bspiCandMC->currentState().mass()<5.0 || bspiCandMC->currentState().mass()>7.0) continue;   // seems Good Bc mass but pion is also working-in this case also
 		       //if(bspiCandMC->currentState().mass()<6.15 || bspiCandMC->currentState().mass()>6.4) continue; 
+		       if(bspiCandMC->currentState().mass()<5.8 || bspiCandMC->currentState().mass()>6.8) continue;
 		       //if(bspiDecayVertexMC->chiSquared()<0) continue;
 
 		       double Bc_Prob_tmp  = TMath::Prob(bspiDecayVertexMC->chiSquared(),(int)bspiDecayVertexMC->degreesOfFreedom());
@@ -932,11 +933,12 @@ void Bspi::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
 
 		       //Bspi_mass_vertex->push_back( bspiCandMC->currentState().mass() );
 		       //=========== Information of Bc meson
-		       deltaMass->push_back( Bc4V.M() - Bs4V.M() ); //+ bs_mass );
+		       //deltaMass->push_back( Bc4V.M() - Bs4V.M() ); //+ bs_mass );
+		       deltaMass->push_back( bspiCandMC->currentState().mass() - bCandMC->currentState().mass() ); //+ bs_mass );
 		       //Bspion_mass->push_back( Bc4V.M() );
-		       Bc_mass->push_back(Bc4V.M());
+		       //Bc_mass->push_back(Bc4V.M());
 		       //Bc_mass->push_back(Bc_mass_cjp_tmp);
-		       //Bc_mass->push_back(bspiCandMC->currentState().mass());
+		       Bc_mass->push_back(bspiCandMC->currentState().mass());
                        Bc_pt->push_back(bspiCandMC->currentState().globalMomentum().perp());
                        //Bc_px->push_back(Bc4V.Px());
                        //Bc_py->push_back(Bc4V.Py());

@@ -15,7 +15,7 @@ from Configuration.AlCa.GlobalTag import GlobalTag
 #-----------------------------
 #process.GlobalTag = GlobalTag(process.GlobalTag, 'auto:run2_data') # for 2018, GT for DATA
 #process.GlobalTag = GlobalTag(process.GlobalTag, '102X_dataRun2_v14', '') # for 2018, GT for MC
-# GT for MC
+#----- GT for MC
 process.GlobalTag = GlobalTag(process.GlobalTag, '102X_upgrade2018_realistic_v21', '')# for 2018
 #process.GlobalTag = GlobalTag(process.GlobalTag, '102X_mc2017_realistic_v8', '')# for 2017
 #process.GlobalTag = GlobalTag(process.GlobalTag, '102X_mcRun2_asymptotic_v8', '')# for 2016
@@ -35,7 +35,6 @@ process.source = cms.Source("PoolSource",
         'gsiftp://eosuserftp.cern.ch/eos/user/m/moameen/MCsamplesForBc2BsPi/PrivateMC-2018-BcToBsPi/BcToBsPi_13TeV_bcvegpy_pythia8_evtgen/220310_180019/0000/BcToBsPi_miniAOD_1.root',
         #'gsiftp://eosuserftp.cern.ch/eos/user/m/moameen/MCsamplesForBc2BsPi/PrivateMC-2018-BcToBsPi/BcToBsPi_13TeV_bcvegpy_pythia8_evtgen/220310_180019/0000/BcToBsPi_miniAOD_10.root',
 
-        #'/store/data/Run2018A/Charmonium/MINIAOD/17Sep2018-v1/00000/01A4FC1E-4A66-544A-B703-31CE3EFF6A28.root',
 	#duplicateCheckMode = cms.untracked.string('noDuplicateCheck')
              
  )
@@ -75,13 +74,7 @@ process.rootuple = cms.EDAnalyzer('Bspi',
                           bMasscut          = cms.vdouble(5.0,6.0),        
                           )
 process.TFileService = cms.Service("TFileService",
-        #fileName = cms.string('PvtMC-BsPi_genlevel.root'),
-        #fileName = cms.string('PvtMC-BsPi_FlatNtuple_07May2022.root'),
-        #fileName = cms.string('PvtMC-BsPi_FlatNtuple_17May2022_v0.root'),
-        #fileName = cms.string('PvtMC-BsPi_FlatNtuple_08Jun2022.root'),
-        fileName = cms.string('PvtMC-BsPi_FlatNtuple_27Jun2022.root'),
-        #fileName = cms.string('BctoBsPi-Data2018A_miniAOD.root'),
-        #fileName = cms.string('BctoBsPi-BcmassPeak_Testing.root'),
+        fileName = cms.string('PvtMC-BsPi_FlatNtuple_28July2022.root'),
 )
 
 

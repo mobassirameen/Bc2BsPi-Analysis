@@ -154,6 +154,8 @@ private:
 
   std::vector<float>    *Bc_DecayVtxX        , *Bc_DecayVtxY      , *Bc_DecayVtxZ;
   std::vector<float>    *Bc_DecayVtxXE       , *Bc_DecayVtxYE     , *Bc_DecayVtxZE;
+  std::vector<double>   *Bc_DecayVtxXYE      , *Bc_DecayVtxXZE    , *Bc_DecayVtxYZE;
+
   //std::vector<float>    *Bc_DecayVtx_vtxfit_X        , *Bc_DecayVtx_vtxfit_Y      , *Bc_DecayVtx_vtxfit_Z;
   //std::vector<float>    *Bc_DecayVtx_vtxfit_XE       , *Bc_DecayVtx_vtxfit_YE     , *Bc_DecayVtx_vtxfit_ZE;
   //std::vector<float>    *Bc_DecayVtx_vtxfit_XYE       , *Bc_DecayVtx_vtxfit_XZE     , *Bc_DecayVtx_vtxfit_YZE;

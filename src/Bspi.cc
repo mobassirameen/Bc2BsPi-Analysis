@@ -130,6 +130,7 @@ Bspi::Bspi(const edm::ParameterSet& iConfig)
 
   Bc_DecayVtxX(0),    Bc_DecayVtxY(0),   Bc_DecayVtxZ(0),
   Bc_DecayVtxXE(0),   Bc_DecayVtxYE(0),  Bc_DecayVtxZE(0),
+  Bc_DecayVtxXYE(0),   Bc_DecayVtxXZE(0),   Bc_DecayVtxYZE(0),
 
   //Bc_DecayVtx_vtxfit_X(0),   Bc_DecayVtx_vtxfit_Y(0),  Bc_DecayVtx_vtxfit_Z(0),
   //Bc_DecayVtx_vtxfit_XE(0),   Bc_DecayVtx_vtxfit_YE(0),  Bc_DecayVtx_vtxfit_ZE(0),
@@ -967,6 +968,9 @@ void Bspi::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
                        Bc_DecayVtxXE->push_back(bspiDecayVertexMC->error().cxx());
                        Bc_DecayVtxYE->push_back(bspiDecayVertexMC->error().cyy());
                        Bc_DecayVtxZE->push_back(bspiDecayVertexMC->error().czz());
+		       Bc_DecayVtxXYE ->push_back(bspiDecayVertexMC->error().cyx());
+		       Bc_DecayVtxXZE ->push_back(bspiDecayVertexMC->error().czx());
+		       Bc_DecayVtxYZE ->push_back(bspiDecayVertexMC->error().czy());
 
                        //Bc_DecayVtx_vtxfit_X ->push_back(    BcVtx.x() );
                        //Bc_DecayVtx_vtxfit_Y ->push_back(    BcVtx.y() );
@@ -1197,6 +1201,7 @@ void Bspi::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
 
    Bc_DecayVtxX->clear();    Bc_DecayVtxY->clear();   Bc_DecayVtxZ->clear();
    Bc_DecayVtxXE->clear();   Bc_DecayVtxYE->clear();  Bc_DecayVtxZE->clear();
+   Bc_DecayVtxXYE->clear();   Bc_DecayVtxXZE->clear();   Bc_DecayVtxYZE->clear();
 
    //Bc_DecayVtx_vtxfit_X->clear();   Bc_DecayVtx_vtxfit_Y->clear();  Bc_DecayVtx_vtxfit_Z->clear();
    //Bc_DecayVtx_vtxfit_XE->clear();   Bc_DecayVtx_vtxfit_YE->clear();  Bc_DecayVtx_vtxfit_ZE->clear();
@@ -1650,6 +1655,9 @@ Bspi::beginJob()
   tree_->Branch("Bc_DecayVtxXE"      , &Bc_DecayVtxXE         );
   tree_->Branch("Bc_DecayVtxYE"      , &Bc_DecayVtxYE         );
   tree_->Branch("Bc_DecayVtxZE"      , &Bc_DecayVtxZE         );
+  tree_->Branch("Bspi_DecayVtxXYE"   , &Bc_DecayVtxXYE        );
+  tree_->Branch("Bspi_DecayVtxXZE"   , &Bc_DecayVtxXZE        );
+  tree_->Branch("Bspi_DecayVtxYZE"   , &Bc_DecayVtxYZE        );
 
   //tree_->Branch("Bc_DecayVtx_vtxfit_X"       , &Bc_DecayVtx_vtxfit_X          );
   //tree_->Branch("Bc_DecayVtx_vtxfit_Y"       , &Bc_DecayVtx_vtxfit_Y          );

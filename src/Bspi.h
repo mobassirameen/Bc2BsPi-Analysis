@@ -171,6 +171,8 @@ private:
   std::vector<float>       *B_pion_px_track, *B_pion_py_track, *B_pion_pz_track;
   std::vector<float>       *B_pion_pt_track;
   std::vector<int>         *B_pion_charge;
+
+  std::vector<int>         *pion_PV;
   
   std::vector<float>       *B_phi_mass;
   std::vector<float>       *B_phi_px, *B_phi_py, *B_phi_pz;

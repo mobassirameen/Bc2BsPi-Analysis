@@ -148,6 +148,8 @@ Bspi::Bspi(const edm::ParameterSet& iConfig)
   B_pion_px_track(0), B_pion_py_track(0), B_pion_pz_track(0),
   B_pion_pt_track(0),
   B_pion_charge(0),
+
+  pion_PV(0),
  
   B_phi_mass(0), 
   B_phi_px(0), B_phi_py(0), B_phi_pz(0),
@@ -236,8 +238,10 @@ void Bspi::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
   //*********************************
   // Get event content information
   //*********************************  
+  ESHandle<MagneticField> bFieldHandle;
+  iSetup.get<IdealMagneticFieldRecord>().get(bFieldHandle);
 
- // Kinematic fit
+  // Kinematic fit
   edm::ESHandle<TransientTrackBuilder> theB; 
   iSetup.get<TransientTrackRecord>().get("TransientTrackBuilder",theB); 
 
@@ -807,7 +811,6 @@ void Bspi::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
 		   TVector3 primaryVertex(bestVtx.x(),bestVtx.y(),0.);
 		
 		   // Loking for Pion ---------------------------------------------------------
-
 		   for (unsigned int i = 0, n = thePATTrackHandleT.size(); i<n ; ++i )
 		     {
 		       const pat::PackedCandidate *iTrack3 =  (thePATTrackHandleT)[i];
@@ -829,6 +832,22 @@ void Bspi::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
 		       
 		       reco::TransientTrack pionTT((*theB).build(iTrack3->pseudoTrack()));
 		       if(!pionTT.isValid()) continue;
+
+/* // ------------------------------------------------------------------------------------------------------------
+		       // ******************* condition for get the pion track for the primary vertex (PV)
+		       // first get tracks from the original primary
+		       vector<reco::TransientTrack> vertexTrackspion;
+		       for ( std::vector<TrackBaseRef >::const_iterator iTrack = bestVtx.tracks_begin();
+			 iTrack != bestVtx.tracks_end(); ++iTrack) {
+		         // compare primary tracks to check for matches with B cand
+		         TrackRef trackRefpion = iTrack->castTo<TrackRef>();
+			 // the  tracks in the PV must be patTrack3
+			 if (  (patTrack3 == trackRefpion) ) {
+			    TransientTrack tt(trackRefpion, &(*bFieldHandle) );
+			    vertexTrackspion.push_back(tt);
+			 } //else { std::cout << "found track match with primary" << endl;}
+			}
+*/  // ------------------------------------------------------------------------------------------------------------
 
 		       // ***************************
 		       // Bc invariant mass ()
@@ -1026,6 +1045,7 @@ void Bspi::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
 		       //B_pion_pt_track->push_back(pion4V.Pt());
 		       //B_pion_charge->push_back(pionCand->currentState().particleCharge());
 		       B_pion_charge->push_back(iTrack3->charge());
+		       pion_PV->push_back(iTrack3->fromPV());
 		       pion_track_normchi2  ->push_back(globalTrack3.normalizedChi2());
 		       pion_NumHits->push_back(globalTrack3.numberOfValidHits());
                        pion_NumPixelHits->push_back(globalTrack3.hitPattern().numberOfValidPixelHits()); 
@@ -1225,6 +1245,8 @@ void Bspi::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
    B_pion_px_track->clear(); B_pion_py_track->clear(); B_pion_pz_track->clear();
    B_pion_pt_track->clear(); 
    B_pion_charge->clear();
+
+   pion_PV->clear();
 
    B_phi_px1->clear(); B_phi_py1->clear(); B_phi_pz1->clear(); B_phi_pt1->clear(); B_phi_charge1->clear(); 
    B_phi_eta1->clear(); B_phi_phi1->clear(); 
@@ -1705,6 +1727,9 @@ Bspi::beginJob()
   tree_->Branch("B_pion_pz_track", &B_pion_pz_track);
   tree_->Branch("B_pion_pt_track", &B_pion_pt_track);
   tree_->Branch("B_pion_charge", &B_pion_charge); 
+
+  tree_->Branch("pion_PV", &pion_PV);
+
   tree_->Branch("pion_dxy", &pion_dxy);
   tree_->Branch("pion_dz", &pion_dz);
   tree_->Branch("pion_dxy_", &pion_dxy_);

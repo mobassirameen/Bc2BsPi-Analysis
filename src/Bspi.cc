@@ -203,6 +203,10 @@ Bspi::Bspi(const edm::ParameterSet& iConfig)
   B_DecayVtxXE(0),    B_DecayVtxYE(0),    B_DecayVtxZE(0),
   B_DecayVtxXYE(0),   B_DecayVtxXZE(0),   B_DecayVtxYZE(0),
 
+  B_J_DecayVtxX(0),   B_J_DecayVtxY(0),   B_J_DecayVtxZ(0),
+  B_J_DecayVtxXE(0),  B_J_DecayVtxYE(0),  B_J_DecayVtxZE(0),
+  B_J_DecayVtxXYE(0), B_J_DecayVtxXZE(0), B_J_DecayVtxYZE(0),
+
   deltaRmum(0), deltaRmup(0), deltaRkp(0), deltaRkm(0), deltaRpion(0),
   istruemum(0), istruemup(0), istruekp(0), istruekm(0), istruebs(0), istruepion(0), istruebc(0),
 
@@ -478,6 +482,7 @@ void Bspi::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
   /*
   nB = 0; nMu = 0;
   if( isMC_) {
+  //if( OnlyGen_ ) {
 	tree_->Fill();
 	std::cout << "GenLevel tree is filling" << std::endl;
 	return;
@@ -1085,7 +1090,17 @@ void Bspi::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
 		       B_DecayVtxXYE ->push_back(bDecayVertexMC->error().cyx());
 		       B_DecayVtxXZE ->push_back(bDecayVertexMC->error().czx());
 		       B_DecayVtxYZE ->push_back(bDecayVertexMC->error().czy());
-		       
+		      
+
+		       B_J_DecayVtxX ->push_back( psi_vFit_vertex_noMC->position().x() );
+	               B_J_DecayVtxY ->push_back( psi_vFit_vertex_noMC->position().y() );
+	               B_J_DecayVtxZ ->push_back( psi_vFit_vertex_noMC->position().z() );
+		       B_J_DecayVtxXE ->push_back( psi_vFit_vertex_noMC->error().cxx() );
+	               B_J_DecayVtxYE ->push_back( psi_vFit_vertex_noMC->error().cyy() );
+	               B_J_DecayVtxZE ->push_back( psi_vFit_vertex_noMC->error().czz() );
+	               B_J_DecayVtxXYE ->push_back( psi_vFit_vertex_noMC->error().cyx() );
+	               B_J_DecayVtxXZE ->push_back( psi_vFit_vertex_noMC->error().czx() );
+	               B_J_DecayVtxYZE ->push_back( psi_vFit_vertex_noMC->error().czy() ); 
 		       // ********************* muon-trigger-machint ****************
 		       
 		       const pat::Muon* muon1 = &(*iMuon1);
@@ -1227,6 +1242,10 @@ void Bspi::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
    B_DecayVtxX->clear();     B_DecayVtxY->clear();     B_DecayVtxZ->clear();
    B_DecayVtxXE->clear();    B_DecayVtxYE->clear();    B_DecayVtxZE->clear();
    B_DecayVtxXYE->clear();   B_DecayVtxXZE->clear();   B_DecayVtxYZE->clear();
+
+   B_J_DecayVtxX->clear();   B_J_DecayVtxY->clear();   B_J_DecayVtxZ->clear();
+   B_J_DecayVtxXE->clear();  B_J_DecayVtxYE->clear();  B_J_DecayVtxZE->clear();
+   B_J_DecayVtxXYE->clear(); B_J_DecayVtxXZE->clear(); B_J_DecayVtxYZE->clear();
 
    nVtx = 0; 
    priVtxX = 0;     priVtxY = 0;     priVtxZ = 0; 
@@ -1739,6 +1758,16 @@ Bspi::beginJob()
   tree_->Branch("B_DecayVtxXYE",    &B_DecayVtxXYE);
   tree_->Branch("B_DecayVtxXZE",    &B_DecayVtxXZE);
   tree_->Branch("B_DecayVtxYZE",    &B_DecayVtxYZE);
+
+  tree_->Branch("B_J_DecayVtxX",   &B_J_DecayVtxX);
+  tree_->Branch("B_J_DecayVtxY",   &B_J_DecayVtxY);
+  tree_->Branch("B_J_DecayVtxZ",   &B_J_DecayVtxZ);
+  tree_->Branch("B_J_DecayVtxXE",  &B_J_DecayVtxXE);
+  tree_->Branch("B_J_DecayVtxYE",  &B_J_DecayVtxYE);
+  tree_->Branch("B_J_DecayVtxZE",  &B_J_DecayVtxZE);
+  tree_->Branch("B_J_DecayVtxXYE",  &B_J_DecayVtxXYE);
+  tree_->Branch("B_J_DecayVtxXZE",  &B_J_DecayVtxXZE);
+  tree_->Branch("B_J_DecayVtxYZE",  &B_J_DecayVtxYZE);
 
   tree_->Branch("priVtxX",&priVtxX, "priVtxX/f");
   tree_->Branch("priVtxY",&priVtxY, "priVtxY/f");

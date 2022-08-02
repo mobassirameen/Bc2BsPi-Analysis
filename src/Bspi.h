@@ -224,6 +224,10 @@ private:
   std::vector<double>      *B_DecayVtxXE, *B_DecayVtxYE, *B_DecayVtxZE;
   std::vector<double>      *B_DecayVtxXYE, *B_DecayVtxXZE, *B_DecayVtxYZE;
 
+  std::vector<float>       *B_J_DecayVtxX,   *B_J_DecayVtxY,   *B_J_DecayVtxZ;
+  std::vector<float>       *B_J_DecayVtxXE,  *B_J_DecayVtxYE,  *B_J_DecayVtxZE;
+  std::vector<float>       *B_J_DecayVtxXYE, *B_J_DecayVtxXZE, *B_J_DecayVtxYZE;
+
   std::vector<double>      *deltaRmum,  *deltaRmup,  *deltaRkp,  *deltaRkm,  *deltaRbs,  *deltaRpion; 
   std::vector<bool>        *istruemum,  *istruemup,  *istruekp,  *istruekm,  *istruebs,  *istruepion,  *istruebc;
 

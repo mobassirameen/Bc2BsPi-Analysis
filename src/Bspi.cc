@@ -111,6 +111,8 @@ Bspi::Bspi(const edm::ParameterSet& iConfig)
   mumdxy(0), mupdxy(0), mumdz(0), mupdz(0),
   muon_dca(0),
 
+  ElsigJpsi(0),
+
   tri_Dim25(0), tri_JpsiTk(0), tri_JpsiTkTk(0),
 
   mu1soft(0), mu2soft(0), mu1tight(0), mu2tight(0), 
@@ -238,6 +240,11 @@ void Bspi::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
   //*********************************
   // Get event content information
   //*********************************  
+
+  edm::Handle<reco::BeamSpot> theBeamSpot;
+  iEvent.getByToken(BSLabel_, theBeamSpot);
+  reco::BeamSpot bs = *theBeamSpot;
+
   ESHandle<MagneticField> bFieldHandle;
   iSetup.get<IdealMagneticFieldRecord>().get(bFieldHandle);
 
@@ -545,6 +552,8 @@ void Bspi::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
 	  const pat::Muon *patMuonM = 0;
 	  TrackRef glbTrackP;	  
 	  TrackRef glbTrackM;	  
+          patMuonP = &*iMuon1;
+          patMuonM = &*iMuon2;
 	  
 	  if(iMuon1->charge() == 1){ patMuonP = &(*iMuon1); glbTrackP = iMuon1->track();}
 	  if(iMuon1->charge() == -1){patMuonM = &(*iMuon1); glbTrackM = iMuon1->track();}
@@ -560,10 +569,14 @@ void Bspi::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
 
 	  if(iMuon1->track()->pt()<4.0) continue;
 	  if(iMuon2->track()->pt()<4.0) continue;
-	  //if(fabs(iMuon1->eta())>2.2 || fabs(iMuon2->eta())>2.2) continue;
+	  if(fabs(iMuon1->eta())>2.5 || fabs(iMuon2->eta())>2.5) continue;
 
 	  if(!(glbTrackM->quality(reco::TrackBase::highPurity))) continue;
 	  if(!(glbTrackP->quality(reco::TrackBase::highPurity))) continue;
+
+	  // Soft Muon
+	  if(!muon::isGoodMuon(*patMuonP, muon::TMOneStationTight)) continue;
+	  if(!muon::isGoodMuon(*patMuonM, muon::TMOneStationTight)) continue;
         
 	  //Let's check the vertex and mass
 	  reco::TransientTrack muon1TT((*theB).build(glbTrackP));
@@ -580,7 +593,7 @@ void Bspi::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
 	  cApp.calculate(mu1State, mu2State);
 	  if( !cApp.status() ) continue;
 	  float dca = fabs( cApp.distance() );	  
-	  //if (dca < 0. || dca > 0.5) continue;
+	  if (dca < 0. || dca > 0.5) continue;
 	  //cout<<" closest approach  "<<dca<<endl;
 
 	  
@@ -625,11 +638,33 @@ void Bspi::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
 	      continue; 
 	    }
 
+
 	  psiVertexFitTree->movePointerToTheTop();
 	  
 	  RefCountedKinematicParticle psi_vFit_noMC = psiVertexFitTree->currentParticle();
 	  RefCountedKinematicVertex psi_vFit_vertex_noMC = psiVertexFitTree->currentDecayVertex();
-	  
+
+	  // Evaluate JPsi L/sigma and cosine
+	  math::XYZVector pperp(glbTrackP->px() + glbTrackM->px(), glbTrackP->py() + glbTrackM->py(), 0.);
+	  GlobalError JpsiVertexError = GlobalError(psi_vFit_vertex_noMC->error());
+	  GlobalPoint displacementFromBeamspot(-1*((bs.x0() - psi_vFit_vertex_noMC->position().x()) + (psi_vFit_vertex_noMC->position().z() - bs.z0()) * bs.dxdz()),
+                                           -1*((bs.y0() - psi_vFit_vertex_noMC->position().y()) + (psi_vFit_vertex_noMC->position().z() - bs.z0()) * bs.dydz()), 0);
+	
+	  double LxyJpsi        = displacementFromBeamspot.perp();
+	  double LxyErrJpsi     = sqrt(JpsiVertexError.rerr(displacementFromBeamspot));
+
+	  reco::Vertex::Point     vperp(displacementFromBeamspot.x(),displacementFromBeamspot.y(),0.);
+          double cosJpsiXY      = vperp.Dot(pperp)/(vperp.R()*pperp.R());
+	  if (cosJpsiXY < 0.9) continue;
+	  double elsigJpsi      = 0 ;
+
+	  try          { elsigJpsi= LxyJpsi / LxyErrJpsi ; }
+          catch (...) {cout << __LINE__ << " " << __PRETTY_FUNCTION__ << "\t" << "Floating divide by zero!" << endl ;}
+
+          if(elsigJpsi < 3.0) continue;
+	  ElsigJpsi->push_back(elsigJpsi);
+
+
 	  if( psi_vFit_vertex_noMC->chiSquared() < 0 )
 	    {
 	      //std::cout << "negative chisq from psi fit" << endl;
@@ -641,11 +676,14 @@ void Bspi::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
 	   if(psi_vFit_vertex_noMC->chiSquared()>26.) continue;
 	   if(psi_vFit_noMC->currentState().mass()<2.9 || psi_vFit_noMC->currentState().mass()>3.3) continue;
 
+	   // Trigger requirements: CL, L/Sigma, Cosine and pT
 	   double J_Prob_tmp   = TMath::Prob(psi_vFit_vertex_noMC->chiSquared(),(int)psi_vFit_vertex_noMC->degreesOfFreedom());
-	   if(J_Prob_tmp<0.01)
+	   //if(J_Prob_tmp<0.01)
+	   if(J_Prob_tmp<0.1)
 	     {
 	       continue;
 	     }
+           if(psi_vFit_noMC->currentState().globalMomentum().perp() < 7.0) continue; 
 
 	   //Now that we have a J/psi candidate, we look for phi candidates
 
@@ -909,12 +947,6 @@ void Bspi::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
 
 		       //double Bc_mass_cjp_tmp = bspiCandMC->currentState().mass();
 		       //if(fabs(Bc_mass_cjp_tmp - PDG_BC_MASS) > 0.2) continue;
-		       //if(bspiCandMC->currentState().mass()<6.1 || bspiCandMC->currentState().mass()>6.7) continue;
-		       //if(bspiCandMC->currentState().mass()<6.1 || bspiCandMC->currentState().mass()>6.5) continue;
-		       //if(bspiCandMC->currentState().mass()<6.1 || bspiCandMC->currentState().mass()>6.3) continue;
-		       //if(bspiCandMC->currentState().mass()<6.13 || bspiCandMC->currentState().mass()>6.25) continue;
-		       //if(bspiCandMC->currentState().mass()<6.15 || bspiCandMC->currentState().mass()>6.22) continue;
-		       //if(bspiCandMC->currentState().mass()<5.8 || bspiCandMC->currentState().mass()>6.6) continue;
 		       //if(bspiCandMC->currentState().mass()<6.19 || bspiCandMC->currentState().mass()>6.22) continue; // Good Bc mass peak but problem with pion matching
 		       //if(bspiCandMC->currentState().mass()<6.26|| bspiCandMC->currentState().mass()>6.28) continue; // Good Bc and pion is also matching- This mass window applied for MC and data- using this I also working with BDT.
 		       //if(bspiCandMC->currentState().mass()<5.4 || bspiCandMC->currentState().mass()>7.2) continue;   // seems Good Bc mass but pion is also working-in this case also
@@ -1304,6 +1336,8 @@ void Bspi::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
    mupAngT->clear(); mupNHits->clear(); mupNPHits->clear();
    mumdxy->clear(); mupdxy->clear(); mumdz->clear(); mupdz->clear(); muon_dca->clear();
 
+   ElsigJpsi->clear();
+
    tri_Dim25->clear(); tri_JpsiTk->clear(); tri_JpsiTkTk->clear(); 
 
    mu1soft->clear(); mu2soft->clear(); mu1tight->clear(); mu2tight->clear();
@@ -1677,9 +1711,12 @@ Bspi::beginJob()
   tree_->Branch("Bc_DecayVtxXE"      , &Bc_DecayVtxXE         );
   tree_->Branch("Bc_DecayVtxYE"      , &Bc_DecayVtxYE         );
   tree_->Branch("Bc_DecayVtxZE"      , &Bc_DecayVtxZE         );
-  tree_->Branch("Bspi_DecayVtxXYE"   , &Bc_DecayVtxXYE        );
-  tree_->Branch("Bspi_DecayVtxXZE"   , &Bc_DecayVtxXZE        );
-  tree_->Branch("Bspi_DecayVtxYZE"   , &Bc_DecayVtxYZE        );
+  //tree_->Branch("Bspi_DecayVtxXYE"   , &Bc_DecayVtxXYE        );
+  tree_->Branch("Bc_DecayVtxXYE"   , &Bc_DecayVtxXYE        );
+  //tree_->Branch("Bspi_DecayVtxXZE"   , &Bc_DecayVtxXZE        );
+  tree_->Branch("Bc_DecayVtxXZE"   , &Bc_DecayVtxXZE        );
+  //tree_->Branch("Bspi_DecayVtxYZE"   , &Bc_DecayVtxYZE        );
+  tree_->Branch("Bc_DecayVtxYZE"   , &Bc_DecayVtxYZE        );
 
   //tree_->Branch("Bc_DecayVtx_vtxfit_X"       , &Bc_DecayVtx_vtxfit_X          );
   //tree_->Branch("Bc_DecayVtx_vtxfit_Y"       , &Bc_DecayVtx_vtxfit_Y          );
@@ -1881,6 +1918,8 @@ Bspi::beginJob()
   tree_->Branch("mumdz",&mumdz);
   tree_->Branch("mupdz",&mupdz);
   tree_->Branch("muon_dca",&muon_dca);
+
+  tree_->Branch("ElsigJpsi",&ElsigJpsi);
 
   tree_->Branch("tri_Dim25",&tri_Dim25);
   tree_->Branch("tri_JpsiTk",&tri_JpsiTk);

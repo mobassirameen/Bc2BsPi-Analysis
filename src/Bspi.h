@@ -133,7 +133,7 @@ private:
   std::vector<int>         *mupAngT, *mupNHits, *mupNPHits;
   std::vector<float>       *mumdxy, *mupdxy, *mumdz, *mupdz;
   std::vector<float>       *muon_dca;
-  std::vector<double>      *ElsigJpsi;
+  //std::vector<double>      *ElsigJpsi;
 
   std::vector<int>         *tri_Dim25, *tri_JpsiTk, *tri_JpsiTkTk; 
 
@@ -220,6 +220,9 @@ private:
   std::vector<float>       *B_pv2ip , *B_pv2iperr, *B_pv2ips, *B_pv2lzip, *B_pv2lziperr,*B_pv2lzips;
   std::vector<float>       *B_l3d_pv2,  *B_l3dE_pv2;
   
+  //std::vector<float>       *Bs_lxy, *Bs_lxyE ; 
+  //std::vector<float>       *ElsigBs;
+  //std::vector<float>       *Bs_cosalphaxy;
   // ********************************** ************************************************************************
 
   std::vector<float>       *Bc_chi2, *B_chi2, *B_J_chi2;

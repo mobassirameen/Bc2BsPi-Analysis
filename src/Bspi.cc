@@ -111,7 +111,7 @@ Bspi::Bspi(const edm::ParameterSet& iConfig)
   mumdxy(0), mupdxy(0), mumdz(0), mupdz(0),
   muon_dca(0),
 
-  ElsigJpsi(0),
+  //ElsigJpsi(0),
 
   tri_Dim25(0), tri_JpsiTk(0), tri_JpsiTkTk(0),
 
@@ -132,7 +132,7 @@ Bspi::Bspi(const edm::ParameterSet& iConfig)
 
   Bc_DecayVtxX(0),    Bc_DecayVtxY(0),   Bc_DecayVtxZ(0),
   Bc_DecayVtxXE(0),   Bc_DecayVtxYE(0),  Bc_DecayVtxZE(0),
-  Bc_DecayVtxXYE(0),   Bc_DecayVtxXZE(0),   Bc_DecayVtxYZE(0),
+  Bc_DecayVtxXYE(0),  Bc_DecayVtxXZE(0), Bc_DecayVtxYZE(0),
 
   //Bc_DecayVtx_vtxfit_X(0),   Bc_DecayVtx_vtxfit_Y(0),  Bc_DecayVtx_vtxfit_Z(0),
   //Bc_DecayVtx_vtxfit_XE(0),   Bc_DecayVtx_vtxfit_YE(0),  Bc_DecayVtx_vtxfit_ZE(0),
@@ -199,6 +199,9 @@ Bspi::Bspi(const edm::ParameterSet& iConfig)
 
   B_l3d_pv2(0),  B_l3dE_pv2(0),
   
+  //Bs_lxy(0), Bs_lxyE(0),
+  //ElsigBs(0),
+  //Bs_cosalphaxy(0),
   // ************************ ****************************************************
 
   Bc_chi2(0), B_chi2(0), B_J_chi2(0), 
@@ -241,9 +244,9 @@ void Bspi::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
   // Get event content information
   //*********************************  
 
-  edm::Handle<reco::BeamSpot> theBeamSpot;
-  iEvent.getByToken(BSLabel_, theBeamSpot);
-  reco::BeamSpot bs = *theBeamSpot;
+  //edm::Handle<reco::BeamSpot> theBeamSpot;
+  //iEvent.getByToken(BSLabel_, theBeamSpot);
+  //reco::BeamSpot bs = *theBeamSpot;
 
   ESHandle<MagneticField> bFieldHandle;
   iSetup.get<IdealMagneticFieldRecord>().get(bFieldHandle);
@@ -552,8 +555,8 @@ void Bspi::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
 	  const pat::Muon *patMuonM = 0;
 	  TrackRef glbTrackP;	  
 	  TrackRef glbTrackM;	  
-          patMuonP = &*iMuon1;
-          patMuonM = &*iMuon2;
+          //patMuonP = &*iMuon1;
+          //patMuonM = &*iMuon2;
 	  
 	  if(iMuon1->charge() == 1){ patMuonP = &(*iMuon1); glbTrackP = iMuon1->track();}
 	  if(iMuon1->charge() == -1){patMuonM = &(*iMuon1); glbTrackM = iMuon1->track();}
@@ -569,7 +572,7 @@ void Bspi::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
 
 	  if(iMuon1->track()->pt()<4.0) continue;
 	  if(iMuon2->track()->pt()<4.0) continue;
-	  if(fabs(iMuon1->eta())>2.5 || fabs(iMuon2->eta())>2.5) continue;
+	  //if(fabs(iMuon1->eta())>2.2 || fabs(iMuon2->eta())>2.2) continue;
 
 	  if(!(glbTrackM->quality(reco::TrackBase::highPurity))) continue;
 	  if(!(glbTrackP->quality(reco::TrackBase::highPurity))) continue;
@@ -593,7 +596,7 @@ void Bspi::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
 	  cApp.calculate(mu1State, mu2State);
 	  if( !cApp.status() ) continue;
 	  float dca = fabs( cApp.distance() );	  
-	  if (dca < 0. || dca > 0.5) continue;
+	  //if (dca < 0. || dca > 0.5) continue;
 	  //cout<<" closest approach  "<<dca<<endl;
 
 	  
@@ -644,7 +647,8 @@ void Bspi::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
 	  RefCountedKinematicParticle psi_vFit_noMC = psiVertexFitTree->currentParticle();
 	  RefCountedKinematicVertex psi_vFit_vertex_noMC = psiVertexFitTree->currentDecayVertex();
 
-	  // Evaluate JPsi L/sigma and cosine
+	  // Evaluate JPsi L/sigma and cosine -----> Jhovanny's suggestion: The following cut must apply 'ofline' after rootuple production.
+	  /*
 	  math::XYZVector pperp(glbTrackP->px() + glbTrackM->px(), glbTrackP->py() + glbTrackM->py(), 0.);
 	  GlobalError JpsiVertexError = GlobalError(psi_vFit_vertex_noMC->error());
 	  GlobalPoint displacementFromBeamspot(-1*((bs.x0() - psi_vFit_vertex_noMC->position().x()) + (psi_vFit_vertex_noMC->position().z() - bs.z0()) * bs.dxdz()),
@@ -662,8 +666,8 @@ void Bspi::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
           catch (...) {cout << __LINE__ << " " << __PRETTY_FUNCTION__ << "\t" << "Floating divide by zero!" << endl ;}
 
           if(elsigJpsi < 3.0) continue;
-	  ElsigJpsi->push_back(elsigJpsi);
-
+	  //ElsigJpsi->push_back(elsigJpsi);
+	  */
 
 	  if( psi_vFit_vertex_noMC->chiSquared() < 0 )
 	    {
@@ -678,12 +682,12 @@ void Bspi::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
 
 	   // Trigger requirements: CL, L/Sigma, Cosine and pT
 	   double J_Prob_tmp   = TMath::Prob(psi_vFit_vertex_noMC->chiSquared(),(int)psi_vFit_vertex_noMC->degreesOfFreedom());
-	   //if(J_Prob_tmp<0.01)
-	   if(J_Prob_tmp<0.1)
+	   //if(J_Prob_tmp<0.1)
+	   if(J_Prob_tmp<0.01)
 	     {
 	       continue;
 	     }
-           if(psi_vFit_noMC->currentState().globalMomentum().perp() < 7.0) continue; 
+           //if(psi_vFit_noMC->currentState().globalMomentum().perp() < 7.0) continue; 
 
 	   //Now that we have a J/psi candidate, we look for phi candidates
 
@@ -777,6 +781,44 @@ void Bspi::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
 		   RefCountedKinematicParticle bCandMC = vertexFitTree->currentParticle();
 		   RefCountedKinematicVertex bDecayVertexMC = vertexFitTree->currentDecayVertex();
 
+		   // Evaluate Bs L/sigma and cosine ---> Jhovanny's Suggestion: These cuts to be used 'off-line' after the rootuple production.
+		   // That's why we comment following lines
+		   /*
+                   VertexDistanceXY BsdistanceXYfromPV;
+		   auto BsdistXY = BsdistanceXYfromPV.distance(bestVtx, bDecayVertexMC->vertexState() );
+
+		   float LxyBs = BsdistXY.value();
+		   float LxyErrBs = BsdistXY.error();
+
+		   //Bs_lxy->push_back(LxyBs);
+		   //Bs_lxyE->push_back(LxyErrBs);
+
+		   float elsigBs      = 0.0 ;
+		   try          { elsigBs = LxyBs / LxyErrBs ; }
+  		   catch (...) {cout << __LINE__ << " " << __PRETTY_FUNCTION__ << "\t" << "Floating divide by zero!" << endl ;}
+
+		   if( elsigBs < 3.0 ) continue;
+		   //ElsigBs->push_back(elsigBs);
+
+		   TVector3 Bsplab(bCandMC->currentState().globalMomentum().x(),
+		                 bCandMC->currentState().globalMomentum().y(),
+		                 bCandMC->currentState().globalMomentum().z());
+		   TVector3 Bsp1(bestVtx.x(), bestVtx.y(), bestVtx.z());
+		   TVector3 Bsp2(bDecayVertexMC->vertexState().position().x(), 
+	                         bDecayVertexMC->vertexState().position().y(), 
+	                         bDecayVertexMC->vertexState().position().z());
+
+		   TVector3 BspDiff = Bsp2-Bsp1;
+		   TVector3 BspDiffXY = TVector3(BspDiff.X(), BspDiff.Y(), 0.);
+		   TVector3 Bsptrans  = TVector3(Bsplab.X(), Bsplab.Y(), 0.);
+		   double BscosAlphaXY(-999.);
+
+		   BscosAlphaXY  = Bsptrans.Dot(BspDiffXY) / (Bsptrans.Mag() * BspDiffXY.Mag());
+
+		   if (BscosAlphaXY < 0.99) continue;
+		   //Bs_cosalphaxy -> push_back(BscosAlphaXY);			
+		   */
+
 		   reco::TransientTrack BsTrack = bCandMC->refittedTransientTrack();
 
 		   if (!bDecayVertexMC->vertexIsValid()){
@@ -801,6 +843,7 @@ void Bspi::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
 		     {
 		       continue;
 		     }
+		   //if(bCandMC->currentState().globalMomentum().perp() < 10.0) continue;
 		    /*-----------------------------------------------------------------------
 		    // Chosing the closest PV in Z direction to the Bs trajectory projection
 		    double dzMin = 1000000.;
@@ -860,6 +903,7 @@ void Bspi::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
 		       if(!(iTrack3->trackHighPurity())) continue;
 		       if(iTrack3->numberOfPixelHits()<1)continue;
 		       if(iTrack3->numberOfHits()<5)continue;
+		       //if(!(iTrack3->fromPV()==3))continue;
 		       		       
 		       //Now let's checks if our muons do not use the same tracks as we are using now
 		       if ( IsTheSame(*iTrack3,*iMuon1) || IsTheSame(*iTrack3,*iMuon2) ) continue;
@@ -871,21 +915,6 @@ void Bspi::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
 		       reco::TransientTrack pionTT((*theB).build(iTrack3->pseudoTrack()));
 		       if(!pionTT.isValid()) continue;
 
-/* // ------------------------------------------------------------------------------------------------------------
-		       // ******************* condition for get the pion track for the primary vertex (PV)
-		       // first get tracks from the original primary
-		       vector<reco::TransientTrack> vertexTrackspion;
-		       for ( std::vector<TrackBaseRef >::const_iterator iTrack = bestVtx.tracks_begin();
-			 iTrack != bestVtx.tracks_end(); ++iTrack) {
-		         // compare primary tracks to check for matches with B cand
-		         TrackRef trackRefpion = iTrack->castTo<TrackRef>();
-			 // the  tracks in the PV must be patTrack3
-			 if (  (patTrack3 == trackRefpion) ) {
-			    TransientTrack tt(trackRefpion, &(*bFieldHandle) );
-			    vertexTrackspion.push_back(tt);
-			 } //else { std::cout << "found track match with primary" << endl;}
-			}
-*/  // ------------------------------------------------------------------------------------------------------------
 
 		       // ***************************
 		       // Bc invariant mass ()
@@ -1043,6 +1072,10 @@ void Bspi::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
 		       B_eta->push_back(bCandMC->currentState().globalMomentum().eta());
 		       B_phi->push_back(bCandMC->currentState().globalMomentum().phi());
 		       
+		       //Bs_lxy->push_back(LxyBs);
+                       //Bs_lxyE->push_back(LxyErrBs);
+		       //ElsigBs->push_back(elsigBs);
+		       //Bs_cosalphaxy -> push_back(BscosAlphaXY);
 		       //========= Information of Phi meson  
 		       B_phi_mass->push_back( pipi4V.M() );
 		       B_phi_px->push_back( pipi4V.Px() );
@@ -1061,6 +1094,7 @@ void Bspi::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
 		       B_J_eta->push_back( psi_vFit_noMC->currentState().globalMomentum().eta() );
 		       B_J_phi->push_back( psi_vFit_noMC->currentState().globalMomentum().phi() );
 
+		       //ElsigJpsi->push_back(elsigJpsi);
 		       //========= Getting Pion Information ================
 
 		       //B_pion_px->push_back(PionTrk.momentum().x());
@@ -1324,6 +1358,9 @@ void Bspi::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
    
    B_l3d_pv2->clear();  B_l3dE_pv2->clear();
    
+   //Bs_lxy->clear(); Bs_lxyE->clear();
+   //ElsigBs->clear();
+   //Bs_cosalphaxy->clear();
    //******************************************************************
 
    k1dxy->clear(); k2dxy->clear(); k1dz->clear(); k2dz->clear();
@@ -1336,7 +1373,7 @@ void Bspi::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
    mupAngT->clear(); mupNHits->clear(); mupNPHits->clear();
    mumdxy->clear(); mupdxy->clear(); mumdz->clear(); mupdz->clear(); muon_dca->clear();
 
-   ElsigJpsi->clear();
+   //ElsigJpsi->clear();
 
    tri_Dim25->clear(); tri_JpsiTk->clear(); tri_JpsiTkTk->clear(); 
 
@@ -1494,17 +1531,6 @@ for (std::vector<int>::size_type j = 0; j < Bc_mass->size(); j++) {
 		deltaRpion->push_back( deltaEtaPhipion );
 
 		if (deltaEtaPhipion < TruthMatchPionMaxR_) {
-		//if (deltaEtaPhipion < 0.1)  // Entery = 3
-		//if (deltaEtaPhipion < 0.2)  // Entery = 7
-		//if (deltaEtaPhipion < 0.3)  // Entery = 13
-		//if (deltaEtaPhipion < 0.4)  // Entery = 23
-		//if (deltaEtaPhipion < 0.5)  // Entery = 27
-		//if (deltaEtaPhipion < 0.6)  // Entery = 32
-		//if (deltaEtaPhipion < 0.7)  // Entery = 34
-		//if (deltaEtaPhipion < 0.8)  // Entery = 39 // <--
-		//if (deltaEtaPhipion < 0.9)  // Entery = 39
-		//if (deltaEtaPhipion < 1.0)  // Entery = 39
-		//if (deltaEtaPhipion < 0.09) // Entery = 1
                         istruepion->push_back(true);
 			//std::cout<<"Getting correct pion "<<std::endl;
                 } else {
@@ -1711,11 +1737,8 @@ Bspi::beginJob()
   tree_->Branch("Bc_DecayVtxXE"      , &Bc_DecayVtxXE         );
   tree_->Branch("Bc_DecayVtxYE"      , &Bc_DecayVtxYE         );
   tree_->Branch("Bc_DecayVtxZE"      , &Bc_DecayVtxZE         );
-  //tree_->Branch("Bspi_DecayVtxXYE"   , &Bc_DecayVtxXYE        );
   tree_->Branch("Bc_DecayVtxXYE"   , &Bc_DecayVtxXYE        );
-  //tree_->Branch("Bspi_DecayVtxXZE"   , &Bc_DecayVtxXZE        );
   tree_->Branch("Bc_DecayVtxXZE"   , &Bc_DecayVtxXZE        );
-  //tree_->Branch("Bspi_DecayVtxYZE"   , &Bc_DecayVtxYZE        );
   tree_->Branch("Bc_DecayVtxYZE"   , &Bc_DecayVtxYZE        );
 
   //tree_->Branch("Bc_DecayVtx_vtxfit_X"       , &Bc_DecayVtx_vtxfit_X          );
@@ -1890,6 +1913,11 @@ Bspi::beginJob()
   //tree_->Branch("B_cosalphaxy",&B_cosalphaxy);
   tree_->Branch("Bc_cosalphaxy",&Bc_cosalphaxy);
   tree_->Branch("alpha",&alpha);
+
+  //tree_->Branch("Bs_lxy", &Bs_lxy);
+  //tree_->Branch("Bs_lxyE",&Bs_lxyE);
+  //tree_->Branch("ElsigBs",&ElsigBs);
+  //tree_->Branch("Bs_cosalphaxy",&Bs_cosalphaxy);
   // *************************
   
   tree_->Branch("k1dxy",&k1dxy);
@@ -1919,7 +1947,7 @@ Bspi::beginJob()
   tree_->Branch("mupdz",&mupdz);
   tree_->Branch("muon_dca",&muon_dca);
 
-  tree_->Branch("ElsigJpsi",&ElsigJpsi);
+  //tree_->Branch("ElsigJpsi",&ElsigJpsi);
 
   tree_->Branch("tri_Dim25",&tri_Dim25);
   tree_->Branch("tri_JpsiTk",&tri_JpsiTk);

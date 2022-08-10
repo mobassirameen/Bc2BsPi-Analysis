@@ -647,7 +647,7 @@ void Bspi::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
 	  RefCountedKinematicParticle psi_vFit_noMC = psiVertexFitTree->currentParticle();
 	  RefCountedKinematicVertex psi_vFit_vertex_noMC = psiVertexFitTree->currentDecayVertex();
 
-	  // Evaluate JPsi L/sigma and cosine -----> Jhovanny's suggestion: The following cut must apply 'ofline' after rootuple production.
+	  // Evaluate JPsi L/sigma and cosine -----> Jhovanny's suggestion: These cuts must apply 'offline' after rootuple production.
 	  /*
 	  math::XYZVector pperp(glbTrackP->px() + glbTrackM->px(), glbTrackP->py() + glbTrackM->py(), 0.);
 	  GlobalError JpsiVertexError = GlobalError(psi_vFit_vertex_noMC->error());
@@ -1038,7 +1038,7 @@ void Bspi::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
                        Bc_charge->push_back(bspiCandMC->currentState().particleCharge());
 		       //Bcvtxcl->push_back(ChiSquaredProbability((double)(BcVtx.chi2()),(double)(BcVtx.ndof())));
 		       Bcvtxcl->push_back(ChiSquaredProbability((double)(bspiDecayVertexMC->chiSquared()),int(rint(bspiDecayVertexMC->degreesOfFreedom()))));
-		       Bcvtxcl->push_back(priVtxCL);
+		       //Bcvtxcl->push_back(priVtxCL);
 		       Bc_prob->push_back(Bc_Prob_tmp);
 		       Bc_chi2->push_back(bspiDecayVertexMC->chiSquared());
 
